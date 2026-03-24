@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head lang="pt-br">
+    <!-- Configurações básicas -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- Título da página -->
+    <title>Projeto Jo-ken-pô</title>
+
+    <!-- Responsividade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="main.css" />
+
+    <!-- JS com defer (garante que o HTML carregue antes) -->
+    <script src="main.js" defer></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Jo-ken-pô</h1>
+
+      <!-- Botões das jogadas -->
+      <div class="sinais">
+        <!-- Cada botão chama a função com uma escolha -->
+        <button id="rock" onclick="playHuman('rock')">✊</button>
+        <button id="paper" onclick="playHuman('paper')">🖐️</button>
+        <button id="scissors" onclick="playHuman('scissors')">✌️</button>
+      </div>
+
+      <!-- Resultado da partida -->
+      <p class="result"></p>
+
+      <!-- Escolha da máquina -->
+      <p class="machine_choice"></p>
+
+      <!-- Placar -->
+      <p class="your_score">Sua pontuação: <span>0</span></p>
+      <p class="machine_score">Pontuação do computador: <span>0</span></p>
+    </div>
+  </body>
+</html>

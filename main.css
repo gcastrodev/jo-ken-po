@@ -1,0 +1,185 @@
+/* Reset padrão (evita inconsistências entre navegadores) */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Fundo da página */
+body {
+    background: url('assets/public/img.jpg');
+    width: 100%;
+    min-height: 100vh;
+
+    /* Ajuste da imagem */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* Centralização do conteúdo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cores dos botões (identidade visual) */
+#rock {
+    background-color: #FFFF00;
+}
+
+#paper {
+    background-color: #0000ff;
+}
+
+#scissors {
+    background-color: #ff0000;
+}
+
+/* Animação dos botões */
+button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s;
+}
+
+button:hover {
+    transform: scale(1.2); /* aumenta ao passar o mouse */
+    opacity: 0.8;
+}
+
+button:active {
+    transform: scale(0.9); /* efeito de clique */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    opacity: 0.6;
+}
+
+/* Cores do placar */
+.your_score span {
+    color: rgb(17, 17, 219);
+}
+
+.machine_score span {
+    color: rgb(151, 16, 16);
+}
+
+/* Área de resultado */
+.result {
+    font-size: 24px;
+    margin-top: 10px;
+    min-height: 30px; /* evita "pulo" no layout */
+}
+
+/* Estados do resultado */
+.win {
+    color: green;
+}
+
+.lose {
+    color: red;
+}
+
+.draw {
+    color: orange;
+}
+
+/* Texto da jogada da máquina */
+.machine_choice {
+    font-size: 18px;
+    margin-top: 5px;
+    opacity: 0.8;
+}
+
+/* =========================
+   RESPONSIVIDADE
+   ========================= */
+
+/* Mobile */
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+        padding: 15px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        background-color: #fff;
+        border-radius: 10px;
+        color: #000;
+        text-align: center;
+        gap: 15px;
+    }
+
+    h1 { font-size: 24px; }
+
+    .sinais {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 8px;
+        font-size: 35px;
+        border-radius: 10px;
+        border: none;
+    }
+}
+
+/* Tablet */
+@media (min-width: 481px) and (max-width: 768px) {
+    .container {
+        width: 60%;
+        padding: 20px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        background-color: #fff;
+        border-radius: 10px;
+        color: #000;
+        text-align: center;
+    }
+
+    h1 { font-size: 28px; }
+
+    .sinais {
+        display: flex;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    button {
+        padding: 10px;
+        font-size: 40px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+    .container {
+        width: 450px;
+        padding: 40px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        background-color: #fff;
+        border-radius: 10px;
+        color: #000;
+        text-align: center;
+    }
+
+    h1 { font-size: 32px; }
+
+    .sinais {
+        display: flex;
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    button {
+        padding: 15px;
+        font-size: 60px;
+    }
+}
