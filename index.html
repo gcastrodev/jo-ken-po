@@ -1,44 +1,339 @@
 <!doctype html>
-<html>
-  <head lang="pt-br">
-    <!-- Configurações básicas -->
+<html lang="pt-BR">
+  <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    
-    <!-- Título da página -->
     <title>Projeto Jo-ken-pô</title>
-
-    <!-- Responsividade -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- CSS -->
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Inter", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS do projeto -->
     <link rel="stylesheet" href="main.css" />
 
-    <!-- JS com defer (garante que o HTML carregue antes) -->
+    <!-- Chart.js para gráfico de desempenho -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- JS do projeto -->
     <script src="main.js" defer></script>
   </head>
 
-  <body>
-    <div class="container">
-      <h1>Jo-ken-pô</h1>
-
-      <!-- Botões das jogadas -->
-      <div class="sinais">
-        <!-- Cada botão chama a função com uma escolha -->
-        <button id="rock" onclick="playHuman('rock')">✊</button>
-        <button id="paper" onclick="playHuman('paper')">🖐️</button>
-        <button id="scissors" onclick="playHuman('scissors')">✌️</button>
-      </div>
-
-      <!-- Resultado da partida -->
-      <p class="result"></p>
-
-      <!-- Escolha da máquina -->
-      <p class="machine_choice"></p>
-
-      <!-- Placar -->
-      <p class="your_score">Sua pontuação: <span>0</span></p>
-      <p class="machine_score">Pontuação do computador: <span>0</span></p>
+  <body class="font-display text-slate-100">
+    <div class="page-bg" aria-hidden="true">
+      <div class="orb orb--1"></div>
+      <div class="orb orb--2"></div>
+      <div class="orb orb--3"></div>
+      <div class="grid-overlay"></div>
     </div>
+
+    <main class="relative z-10 min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <header class="mb-6 flex flex-col gap-4 lg:mb-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <span
+              class="mb-3 inline-flex items-center gap-2 rounded-full border border-fuchsia-400/20 bg-fuchsia-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-fuchsia-200"
+            >
+              Tailwind + Glassmorphism
+            </span>
+
+            <h1 class="text-4xl font-black tracking-tight text-white sm:text-5xl">
+              Jo-ken-pô
+            </h1>
+
+            <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+              Uma versão mais premium do projeto: interface moderna, ranking,
+              múltiplos jogadores, histórico de rodadas e gráfico de desempenho.
+            </p>
+          </div>
+
+          <div class="glass-panel p-4 sm:p-5">
+            <div class="flex flex-wrap items-center gap-4">
+              <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-slate-400">Meta de vitória</p>
+                <strong id="goal-label" class="mt-1 block text-xl font-black text-white">5 pts</strong>
+              </div>
+
+              <div class="h-10 w-px bg-white/10"></div>
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-slate-400">Total de jogadores</p>
+                <strong id="header-player-count" class="mt-1 block text-xl font-black text-white">2</strong>
+              </div>
+
+              <div class="h-10 w-px bg-white/10"></div>
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-slate-400">Rodadas</p>
+                <strong id="header-round-count" class="mt-1 block text-xl font-black text-white">0</strong>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section class="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_380px]">
+          <div class="space-y-6">
+            <section class="glass-panel p-6 sm:p-8">
+              <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div class="max-w-2xl">
+                  <span id="turn-badge" class="status-chip">
+                    0/2 jogadas registradas
+                  </span>
+
+                  <h2 id="result-text" class="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl">
+                    Escolha uma jogada
+                  </h2>
+
+                  <p id="result-subtext" class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+                    Comece a rodada escolhendo pedra, papel ou tesoura.
+                  </p>
+                </div>
+
+                <div class="status-card min-w-[220px]">
+                  <p class="text-xs uppercase tracking-[0.28em] text-slate-400">Status da rodada</p>
+                  <strong id="round-status-label" class="mt-2 block text-lg font-bold text-white">
+                    Aguardando jogadas
+                  </strong>
+                  <p class="mt-2 text-sm text-slate-300">
+                    As escolhas ficam ocultas até a rodada ser resolvida.
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-8">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                  <h3 class="text-sm font-semibold uppercase tracking-[0.28em] text-slate-300">
+                    Painel da rodada
+                  </h3>
+                  <span class="text-xs text-slate-400">multi-player ready</span>
+                </div>
+
+                <div
+                  id="current-round-choices"
+                  class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+                ></div>
+              </div>
+
+              <div class="mt-8">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                  <h3 class="text-sm font-semibold uppercase tracking-[0.28em] text-slate-300">
+                    Jogadas
+                  </h3>
+                  <span id="action-helper" class="text-xs text-slate-400">
+                    Sua vez
+                  </span>
+                </div>
+
+                <div
+                  id="move-buttons"
+                  class="grid gap-4 sm:grid-cols-3"
+                ></div>
+              </div>
+
+              <div class="mt-8 flex flex-wrap gap-3">
+                <button
+                  id="reset-round-btn"
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+                >
+                  Nova rodada
+                </button>
+
+                <button
+                  id="reset-scores-btn"
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-2xl border border-rose-400/20 bg-rose-500/10 px-5 py-3 text-sm font-semibold text-rose-100 transition hover:-translate-y-0.5 hover:bg-rose-500/20"
+                >
+                  Resetar placar
+                </button>
+              </div>
+            </section>
+
+            <section class="grid gap-6 lg:grid-cols-2">
+              <div class="glass-panel p-6">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <h3 class="text-lg font-bold text-white">Histórico de rodadas</h3>
+                    <p class="mt-1 text-sm text-slate-400">As jogadas reveladas aparecem aqui.</p>
+                  </div>
+
+                  <span id="round-counter" class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
+                    0 rodadas
+                  </span>
+                </div>
+
+                <div id="history-list" class="space-y-3"></div>
+              </div>
+
+              <div class="glass-panel p-6">
+                <div class="mb-4">
+                  <h3 class="text-lg font-bold text-white">Ranking</h3>
+                  <p class="mt-1 text-sm text-slate-400">Quem está liderando a partida.</p>
+                </div>
+
+                <div id="ranking-list" class="space-y-3"></div>
+
+                <div class="mt-6 grid grid-cols-3 gap-3">
+                  <div class="metric-card">
+                    <span>Rodadas</span>
+                    <strong id="stats-rounds">0</strong>
+                  </div>
+
+                  <div class="metric-card">
+                    <span>Líder</span>
+                    <strong id="stats-leader">—</strong>
+                  </div>
+
+                  <div class="metric-card">
+                    <span>Maior score</span>
+                    <strong id="stats-best-score">0</strong>
+                  </div>
+                </div>
+
+                <div class="mt-6">
+                  <div class="mb-3 flex items-center justify-between">
+                    <h4 class="text-sm font-semibold uppercase tracking-[0.28em] text-slate-300">
+                      Gráfico de desempenho
+                    </h4>
+                    <span class="text-xs text-slate-400">score por rodada</span>
+                  </div>
+
+                  <div class="rounded-[24px] border border-white/10 bg-white/5 p-4">
+                    <div class="relative h-[260px]">
+                      <canvas id="performance-chart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="space-y-6">
+            <section class="glass-panel p-6">
+              <div class="mb-5">
+                <h3 class="text-lg font-bold text-white">Jogadores</h3>
+                <p class="mt-1 text-sm text-slate-400">
+                  Adicione humanos ou bots sem mudar a estrutura do projeto.
+                </p>
+              </div>
+
+              <form id="add-player-form" class="space-y-4">
+                <div>
+                  <label for="player-name" class="mb-2 block text-sm font-medium text-slate-300">
+                    Nome do jogador
+                  </label>
+                  <input
+                    id="player-name"
+                    type="text"
+                    placeholder="Ex.: Gabriel"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 outline-none transition focus:border-fuchsia-400/40 focus:bg-white/10"
+                  />
+                </div>
+
+                <div>
+                  <label for="player-type" class="mb-2 block text-sm font-medium text-slate-300">
+                    Tipo
+                  </label>
+                  <select
+                    id="player-type"
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-fuchsia-400/40 focus:bg-white/10"
+                  >
+                    <option value="human" class="bg-slate-900 text-white">Humano</option>
+                    <option value="bot" class="bg-slate-900 text-white">Bot</option>
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  class="w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(168,85,247,0.35)]"
+                >
+                  Adicionar jogador
+                </button>
+              </form>
+
+              <div class="mt-4 grid grid-cols-2 gap-3">
+                <button
+                  id="quick-add-human"
+                  type="button"
+                  class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  + Humano
+                </button>
+
+                <button
+                  id="quick-add-bot"
+                  type="button"
+                  class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  + Bot
+                </button>
+              </div>
+
+              <div class="mt-6">
+                <label for="target-score" class="mb-2 block text-sm font-medium text-slate-300">
+                  Meta de vitória
+                </label>
+                <select
+                  id="target-score"
+                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-fuchsia-400/40 focus:bg-white/10"
+                >
+                  <option value="3" class="bg-slate-900 text-white">3 pontos</option>
+                  <option value="5" class="bg-slate-900 text-white" selected>5 pontos</option>
+                  <option value="10" class="bg-slate-900 text-white">10 pontos</option>
+                  <option value="15" class="bg-slate-900 text-white">15 pontos</option>
+                </select>
+              </div>
+
+              <div id="players-list" class="mt-6 space-y-3"></div>
+            </section>
+
+            <section class="glass-panel p-6">
+              <h3 class="text-lg font-bold text-white">Regras</h3>
+
+              <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+                <p>
+                  Cada participante escolhe uma jogada por rodada. As escolhas
+                  ficam escondidas até o resultado final.
+                </p>
+                <p>
+                  O sistema compara todos contra todos e pontua quem venceu mais
+                  confrontos na rodada.
+                </p>
+                <p>
+                  Se houver empate técnico no topo, os líderes da rodada marcam
+                  ponto juntos.
+                </p>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </div>
+    </main>
+
+    <div
+      id="toast-container"
+      class="pointer-events-none fixed bottom-4 right-4 z-50 flex w-full max-w-sm flex-col gap-3 px-4"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
   </body>
 </html>
